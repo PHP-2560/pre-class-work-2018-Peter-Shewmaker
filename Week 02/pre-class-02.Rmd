@@ -68,16 +68,37 @@ plot(exp.draws.1)
 ```
 <br />
 In this plot, the index of the simulated value is plotted against its value. Most of the values are less than 1, as you would expect from the histogram plot.
-&nbsp;
+<br>
     c. Now, use `plot()` with two arguments -- any two of your other stored random value vectors -- to create a scatterplot of the two vectors against each other.
 ```{r}
 plot(exp.draws.1, exp.draws.10)
 ```
+<br>
+For any index i, this graphic plots the ith simulated value of the standard exponential distribution against the ith simulated value of the exponential distribution with rate equal to 10.
 
 4. We'd now like to compare the properties of each of our vectors. Begin by creating a vector of the means of each of our five distributions in the order we created them and saving this to a variable name of your choice. Using this and other similar vectors, create the following scatterplots and explain in words what is going on:
     a. The five means versus the five rates used to generate the distribution.
+```{r}
+#This vector contains the values for the rates used to generate the random values.
+rates <- c(1, 0.2, 5, 7.3, 10)
+#This vector contains the means of the five sets of simulated values.
+means <- c(mean(exp.draws.1), mean(exp.draws.0.2), mean(exp.draws.5), mean(exp.draws.7.3), mean(exp.draws.10))
+#This vector contains the standard deviations of the five sets of simulated values.
+sds <- c(sd(exp.draws.1), sd(exp.draws.0.2), sd(exp.draws.5), sd(exp.draws.7.3), sd(exp.draws.10))
+#This is a plot of the five means versus the five rates used to generate the values.
+plot(means, rates)
+```
+This is a plot of the means versus the rates, generally the mean is close to equal to 1 divided by the rate.
     b. The standard deviations versus the rates.
+```{r}
+#This is a plot of the standard deviations versus the rates.
+plot(sds, rates)
+```
     c. The means versus the standard deviations.
+```{r}
+#This is a plot of the means versus the standard deviations.
+plot(means, sds)
+```
 
 For each plot, explain in words what's going on.
 
