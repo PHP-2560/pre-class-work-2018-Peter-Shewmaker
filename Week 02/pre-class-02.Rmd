@@ -54,27 +54,21 @@ sd(exp.draws.10)
 3. The function `plot()` is the generic function in R for the visual display of data. `hist()` is a function that takes in and bins data as a side effect. To use this function, we must first specify what we'd like to plot.
     a. Use the `hist()` function to produce a histogram of your standard exponential distribution.
 ```{r}
-#Histogram of results from the generated random values from the standard exponential distribution.
+# Histogram of results from the generated random values from the standard exponential distribution.
 hist(exp.draws.1)
+# The histogram tells you how many of the generated random values fall into a given interval.
 ```
-<br />
-The bins each have size 0.5, and the largest bin is the one from 0 to 0.5. The size of the bins then tend to get smaller and smaller, though there are some exceptions.
-<br>
-<br>
-    b. Use `plot()` with this vector to display the random values from your standard distribution in order.
+  b. Use `plot()` with this vector to display the random values from your standard distribution in order.
 ```{r}
 #Plot of the generated random values from the standard exponential distribution.
 plot(exp.draws.1)
+#In this plot, the index of the simulated value is plotted against its value. Most of the values are less than 1, as you would expect from the histogram plot.
 ```
-<br />
-In this plot, the index of the simulated value is plotted against its value. Most of the values are less than 1, as you would expect from the histogram plot.
-<br>
-    c. Now, use `plot()` with two arguments -- any two of your other stored random value vectors -- to create a scatterplot of the two vectors against each other.
+  c. Now, use `plot()` with two arguments -- any two of your other stored random value vectors -- to create a scatterplot of the two vectors against each other.
 ```{r}
 plot(exp.draws.1, exp.draws.10)
+# For a given index i, this graphic plots the ith simulated value of the standard exponential distribution against the ith simulated value of the exponential distribution with rate equal to 10.
 ```
-<br>
-For any index i, this graphic plots the ith simulated value of the standard exponential distribution against the ith simulated value of the exponential distribution with rate equal to 10.
 
 4. We'd now like to compare the properties of each of our vectors. Begin by creating a vector of the means of each of our five distributions in the order we created them and saving this to a variable name of your choice. Using this and other similar vectors, create the following scatterplots and explain in words what is going on:
     a. The five means versus the five rates used to generate the distribution.
@@ -88,16 +82,21 @@ sds <- c(sd(exp.draws.1), sd(exp.draws.0.2), sd(exp.draws.5), sd(exp.draws.7.3),
 #This is a plot of the five means versus the five rates used to generate the values.
 plot(means, rates)
 ```
-This is a plot of the means versus the rates, generally the mean is close to equal to 1 divided by the rate.
-    b. The standard deviations versus the rates.
+* Each of the vectors of generated random values was created from the exponential distribution set at a different rate. This plot connects the mean of the generated random values to the rate they were generated with. The value of the means are all close to 1 divided by the rate they were generated with, which is understandable since the expected value of the exponential distribution is 1 divided by the parameter, which is called the rate in this context.
+
+
+  b. The standard deviations versus the rates.
 ```{r}
 #This is a plot of the standard deviations versus the rates.
 plot(sds, rates)
+#This plot is similar to the previous one, but instead of associating the mean of the generated random values to the rate they were generated with, it associates the standard deviation to the rate. This graph looks quite similar to the previous one, since for the exponential distribution, the expected value is equal to the standard deviation (which again, is 1 divided by the rate).
 ```
-    c. The means versus the standard deviations.
+
+  c. The means versus the standard deviations.
 ```{r}
 #This is a plot of the means versus the standard deviations.
 plot(means, sds)
+#This graphic plots the means of the vectors of generated values to the standard deviations of the same vectors. As previously stated, for the exponential distribution the expected value is equal to the standard deviation. Thus, the closest straight line to match this graph would be quite similar to the identity line y = x.
 ```
 
 For each plot, explain in words what's going on.
@@ -107,10 +106,50 @@ For each plot, explain in words what's going on.
 
 5. R's capacity for data and computation is large to what was available 10 years ago. 
     a. To show this, generate 1.1 million numbers from the standard exponential distribution and store them in a vector called `big.exp.draws.1`. Calculate the mean and standard deviation.
-    b. Plot a histogram of `big.exp.draws.1`.  Does it match the function \(1-e^{-x}\)?  Should it? 
-    c. Find the mean of all of the entries in `big.exp.draws.1` which are strictly greater than 1. You may need to first create a new vector to identify which elements satisfy this.
-    d. Create a matrix, `big.exp.draws.1.mat`, containing the the values in 
-`big.exp.draws.1`, with 1100 rows and 1000 columns. Use this matrix as the input to the `hist()` function and save the result to a variable of your choice. What happens to your data?
-    e. Calculate the mean of the 371st column of `big.exp.draws.1.mat`.
-    f. Now, find the means of all 1000 columns of `big.exp.draws.1.mat` simultaneously. Plot the histogram of column means.  Explain why its shape does not match the histogram in problem 5b).
-   
+```{r}
+#This vector contains 1.1 million values generated from the standard exponential distribution. The mean and standard deviation are then calculated.
+big.exp.draws.1 <- rexp(n = 1100000)
+mean(big.exp.draws.1)
+sd(big.exp.draws.1)
+```
+    
+  b. Plot a histogram of `big.exp.draws.1`.  Does it match the function \(1-e^{-x}\)?  Should it?
+```{r}
+#This is a histogram of the vector of values generated in the previous part of this problem.
+hist(big.exp.draws.1)
+#The histogram clearly does not match the function 1 - e^{-x} since that function is 0 when x = 0, but the histogram is not 0 for the box containing 0. Furthermore, 1 - e^{-x} is an increasing function, but the histogram boxes get smaller and smaller.
+
+#Instead, the function that the histogram resembles is e^{-x}, which makes sense, since e^{-x} is the pdf for the standard exponential distribution. The size of the histogram bin is proportional to the number of elements in the vector, and so each histogram bin gives you a visualization of the probability that a simulated value will be in the interval represented by the bin. This is akin to the fact that the integral of the pdf over an interval gives you the probability of a random value being within that interval.
+
+#Finally, the histogram should not represent 1 - e^{-x}, since that is the CDF of the exponential distribution, which tells you the probability that a simulated value will be less than x - this is not relevant to the histogram.
+```
+  
+  c. Find the mean of all of the entries in `big.exp.draws.1` which are strictly greater than 1. You may need to first create a new vector to identify which elements satisfy this.
+```{r}
+#This vector selects only the generated values that are greater than 1, then the mean is calculated.
+big.exp.draws.1.greater <- big.exp.draws.1[big.exp.draws.1 > 1]
+mean(big.exp.draws.1.greater)
+```
+  
+  d. Create a matrix, `big.exp.draws.1.mat`, containing the the values in big.exp.draws.1`, with 1100 rows and 1000 columns. 
+  Use this matrix as the input to the `hist()` function and save the result to a variable of your choice. What happens to your data?
+```{r}
+#This matrix contains the simulated data, and stores it in 1100 rows and 1000 columns. A histogram is then generated from the matrix data.
+big.exp.draws.1.mat <- matrix(big.exp.draws.1, nrow = 1100, ncol = 1000)
+hist(big.exp.draws.1.mat)
+#The histogram produced is the same as the histogram in part (b), since the histogram function simply treats the matrix as a vector.
+```
+
+  e. Calculate the mean of the 371st column of `big.exp.draws.1.mat`.
+```{r}
+#The mean of the 371st column of the previous generated matrix is calculated.
+mean(big.exp.draws.1.mat[, 371])
+```
+  f. Now, find the means of all 1000 columns of `big.exp.draws.1.mat` simultaneously. Plot the histogram of column means.  Explain why its shape does not match the histogram in problem 5b).
+```{r}
+#This vector contains the means of each column in the previously generated matrix.
+column.means <- colMeans(big.exp.draws.1.mat)
+#Histogram of the column means.
+hist(column.means)
+#The shape does not match that of the histogram from part (b) because instead of the data being simulated values of the standard exponential distribution, each data point is the mean of 1100 of these simulated values. Since the expected value of the standard exponential distribution is 1, we expect that these values should group around 1, which they in fact do. The shape of the histogram is beginning to resemble a normal distribution, with a mean of 1.
+```
