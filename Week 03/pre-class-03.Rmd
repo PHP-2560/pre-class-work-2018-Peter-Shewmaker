@@ -51,9 +51,45 @@ gapminder %>%
         summarise(avg_life_exp = mean(lifeExp))
 ```
 4. What 5 countries have the highest total GDP over all years combined?
+```{r}
+#A new column must be created that contains the total GDP for the given year. This is done with the mutate function, adding a new column called gdp which is the product of GDP per capita (gdpPercap) and population (pop). Then the data is grouped by country, summarised with a total_gdp column which is the sum of the gdp for all of the recorded years. Then the table is arranged in descending order of total_gdp, listing the countries with the highest total gdp first.
+gapminder %>% 
+  mutate(gdp = gdpPercap * pop) %>% 
+    group_by(country) %>% 
+      summarise(total_gdp = sum(gdp)) %>% 
+        arrange(desc(total_gdp))
+#According the table, the 5 countries with the highest total GDP over the recorded years are the US, Japan, China, Germany and the UK.
+```
+
 5. What countries and years had life expectancies of _at least_ 80 years? _N.b. only output the columns of interest: country, life expectancy and year (in that order)._
+```{r}
+#The relevant columns, country, lifeExp, and year are selected using the select function. Then, the data is filtered only for those countries and years where the life expectancy was greater than or equal to 80. The table that is returned gives all countries and years where the life expectancy was at least 80.
+gapminder %>% 
+  select(country, lifeExp, year) %>% 
+    filter(lifeExp >= 80)
+
+```
+
 6. What 10 countries have the strongest correlation (in either direction) between life expectancy and per capita GDP?
+```{r}
+#The data is grouped by country, then summarised with a new column "correlation" that contains the calculated correlation between life expectance and GDP per capita in that country. Then the data is arranged in descending order by the absolute value of the correlation. The table then lists the 10 countries with the strongest correlation. All of the top 10 values show a positive correlation, but there are some countries where life expectancy and GDP per capita are negatively correlated (for example, Kuwait).
+gapminder %>% 
+  group_by(country) %>% 
+    summarise(correlation = cor(lifeExp, gdpPercap)) %>% 
+      arrange(desc(abs(correlation)))
+```
+
 7. Which combinations of continent (besides Asia) and year have the highest average population across all countries? _N.b. your output should include all results sorted by highest average population_. With what you already know, this one may stump you. See [this Q&A](http://stackoverflow.com/q/27207963/654296) for how to `ungroup` before `arrange`ing. This also [behaves differently in more recent versions of dplyr](https://github.com/hadley/dplyr/releases/tag/v0.5.0).
-8. Which three countries have had the most consistent population estimates (i.e. lowest standard deviation) across the years of available data? 
+```{r}
+#The continent Asia is filtered out of the data, which is then grouped by continent and year. Summarise is used to create a new column that calculates the average population for the continent in that year, and then the data is arranged in descending order by average population. The Americas in 2007 have the highest average population under these conditions.
+gapminder %>% 
+  filter(continent != "Asia") %>% 
+    group_by(continent, year) %>% 
+      summarise(avg_pop = mean(pop)) %>% arrange(desc(avg_pop))
+```
+8. Which three countries have had the most consistent population estimates (i.e. lowest standard deviation) across the years of available data?
+```{r}
+#The data is grouped by countries, and summarised with a new column "sd" that contains the standard deviation of population. Then the data is arranged by sd. The countries with the most consistent population estimates are then Sao Tome and Principe, Iceland and Montenegro.
+```
 9. Subset **gm** to only include observations from 1992 and store the results as **gm1992**. What kind of object is this?
 10. Which observations indicate that the population of a country has *decreased* from the previous year **and** the life expectancy has *increased* from the previous year? See [the vignette on window functions](https://cran.r-project.org/web/packages/dplyr/vignettes/window-functions.html).
