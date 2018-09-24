@@ -85,11 +85,27 @@ gapminder %>%
 gapminder %>% 
   filter(continent != "Asia") %>% 
     group_by(continent, year) %>% 
-      summarise(avg_pop = mean(pop)) %>% arrange(desc(avg_pop))
+      summarise(avg_pop = mean(pop)) %>% 
+        arrange(desc(avg_pop))
 ```
 8. Which three countries have had the most consistent population estimates (i.e. lowest standard deviation) across the years of available data?
 ```{r}
 #The data is grouped by countries, and summarised with a new column "sd" that contains the standard deviation of population. Then the data is arranged by sd. The countries with the most consistent population estimates are then Sao Tome and Principe, Iceland and Montenegro.
+gapminder %>% 
+  group_by(country) %>% 
+    summarise(sd = sd(pop)) %>% 
+      arrange(sd)
 ```
 9. Subset **gm** to only include observations from 1992 and store the results as **gm1992**. What kind of object is this?
+```{r}
+#Assuming that "gm" refers to the gapminder data set:
+gm1992 <- filter(gapminder, year == 1992)
+gm1992
+#When you print gm1992, it says that is a tibble.
+```
 10. Which observations indicate that the population of a country has *decreased* from the previous year **and** the life expectancy has *increased* from the previous year? See [the vignette on window functions](https://cran.r-project.org/web/packages/dplyr/vignettes/window-functions.html).
+```{r}
+#The window functions help to solve this problem. The lag function allows you to compare one entry to the one from a previously recorded year (comparing to the immediately previous value is the default, this can be changed). Then the data set is filtered where the population is less than the previously recorded year and the life expectancy is greater than the previously recorded year.
+gapminder %>% 
+  filter(pop < lag(pop) & lifeExp > lag(lifeExp))
+```
