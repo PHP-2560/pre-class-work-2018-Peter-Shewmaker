@@ -15,7 +15,7 @@ install.packages("gapminder")
 
 
 
-```
+```{r}
 library(dplyr)
 library(gapminder)
 gapminder
@@ -28,8 +28,28 @@ gapminder
 Use **dplyr** functions to address the following questions:
 
 1. How many unique countries are represented per continent?
-2. Which European nation had the lowest GDP per capita in 1997? 
+```{r}
+#Using dplyr, first group by the continent, then summarise the data with a new column called "no_of_countries" by applying the n_distinct function to the column "country". This will give a table listing each continent and the number of unique countries listed in that continent.
+gapminder %>% 
+    group_by(continent) %>%
+       summarise(no_of_countries = n_distinct(country))
+```
+2. Which European nation had the lowest GDP per capita in 1997?
+```{r}
+#First, filter the gapminder data set for the continent Europe and the year 1992, and then arrange by gdpPercap - this will give a table of countries in Europe in 1992 ordered by increasing gdpPercap.
+gapminder %>% 
+  filter(continent == "Europe" & year == 1992) %>% 
+    arrange(gdpPercap)
+#The first entry is Albania, with a gdp per capita of 2497.
+```
 3. According to the data available, what was the average life expectancy across each continent in the 1980s?
+```{r}
+#First, filter the data set for years in the 1980s, group by continent and then summarise with a column "avg_life_exp" which is equal to the mean of lifeExp. The table returned will least each continent and its average life expectancy in the 80s.
+gapminder %>% 
+    filter(year > 1979 & year < 1990) %>% 
+      group_by(continent) %>% 
+        summarise(avg_life_exp = mean(lifeExp))
+```
 4. What 5 countries have the highest total GDP over all years combined?
 5. What countries and years had life expectancies of _at least_ 80 years? _N.b. only output the columns of interest: country, life expectancy and year (in that order)._
 6. What 10 countries have the strongest correlation (in either direction) between life expectancy and per capita GDP?
