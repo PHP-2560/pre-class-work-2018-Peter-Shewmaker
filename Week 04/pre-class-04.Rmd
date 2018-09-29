@@ -78,3 +78,12 @@ survey.clean
 ```
 
 B. Now, again using a loop, add a new column to the dataframe called “invalid.answers” that indicates, for each participant, how many bad answers they gave.
+```{r}
+#The invalid.answers column is initialized with zeros.
+survey.clean$invalid.answers <- 0
+for(i in 1:6){
+  #This piece of code adds the number of NAs in each row.
+  survey.clean$invalid.answers[i] = sum(is.na(survey.clean[i,]))
+}
+survey.clean
+```
