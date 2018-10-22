@@ -30,12 +30,85 @@ options(scipen = 3, digits = 3)
 With this project we will simulate a famoues probability problem. This will not require knowledge of probability or statistics but only the logic to follow the steps in order to simulate this problem. This is one way to solve problems by using the computer. 
 
  1. **Gambler's Ruin**: Suppose you have a bankroll of $1000 and make bets of $100 on a fair game. By simulating the outcome directly for at most 5000 iterations of the game (or hands), estimate:
-    a. the probability that you have "busted" (lost all your money) by the time you have placed your one hundredth bet. 
-    b. the probability that you have busted by the time you have placed your five hundredth bet by simulating the outcome directly. 
+    a. the probability that you have "busted" (lost all your money) by the time you have placed your one hundredth bet.
+```{r}
+n_hands <- function(n, bankroll, bet, odds){
+  #This function will give you the amount of money you have if you play n hands with bankroll being the amount of money you begin with betting the amount bet each hand. The odds of winning is given by odds (should be between 0 and 1).
+  for(i in 1:n){
+    win <- rbinom(1,1,odds)
+    if(win == 1){
+      bankroll = bankroll + bet
+    }else{
+      bankroll = bankroll - bet
+    }
+    if(bankroll == 0){
+      #If you run out of money, the function returns 0 and the number of the hand where you bankrupted.
+      return(c(0,i))
+    }
+  }
+  bankroll
+}
+#For 5000 simulations, we run the previous function for 100 hands, with 1000 in the bankroll, 100 per bet and 0.5 for the odds since the game is fair. The number of times that you go bust in 100 hands is recorded, and divided by 5000 to give an estimate of the probability that you will bust within 100 hands.
+n_bust_100 <- 0
+for(i in 1:5000){
+  made <- n_hands(100, 1000, 100, 0.5)
+  if(length(made) == 2){
+    #If length of made is 2, you have busted, by the way the function was defined (it returns 0 and the number of hands until bust).
+    n_bust_100 = n_bust_100 + 1
+  }
+}
+prob_bust_100 = n_bust_100/5000
+prob_bust_100
+``` 
+    b. the probability that you have busted by the time you have placed your five hundredth bet by simulating the outcome directly.
+```{r}
+#This is similar to the last part, except we limit the bets to 500.
+n_bust_500 <- 0
+for(i in 1:5000){
+  made <- n_hands(500, 1000, 100, 0.5)
+  if(length(made) == 2){
+    n_bust_500 = n_bust_500 + 1
+  }
+}
+prob_bust_500 = n_bust_500/5000
+prob_bust_500
+```
     c. the mean time you go bust, given that you go bust within the first 5000 hands.
+```{r}
+#This time we record the time you go bust in 5000 hands, and then take the mean.
+bust_time <- c()
+for(i in 1:5000){
+  made <- n_hands(5000, 1000, 100, 0.5)
+  if(length(made) == 2){
+    #Each time you bust, the hand at which you busted is added to the vector bust_time, from which the mean will be calculated.
+    bust_time <- c(bust_time, made[2])
+  }
+}
+mean(bust_time)
+```
     d. the mean and variance of your bankroll after 100 hands (including busts).
+```{r}
+#In each simulation of 100 hands, your bankroll is added to a vector. Then the mean and variance is calculated.
+end_bankroll_100 <- c()
+for(i in 1:5000){
+  made <- n_hands(100, 1000, 100, 0.5)
+  end_bankroll_100 <- c(end_bankroll_100, made[1])
+}
+mean(end_bankroll_100)
+var(end_bankroll_100)
+```
     e. the mean and variance of your bankroll after 500 hands (including busts).
- 
+```{r}
+#In each simulation of 500 hands, your bankroll is added to a vector. Then the mean and variance is calculated.
+end_bankroll_500 <- c()
+for(i in 1:5000){
+  made <- n_hands(500, 1000, 100, 0.5)
+  end_bankroll_500 <- c(end_bankroll_500, made[1])
+}
+mean(end_bankroll_500)
+var(end_bankroll_500)
+```    
+
 Note: you *must* stop playing if your player has gone bust. How will you handle this in the `for` loop?
 
 2. **Markov Chains**. Suppose you have a game where the probability of winning on your first hand is 48%; each time you win, that probability goes up by one percentage point for the next game (to a maximum of 100%, where it must stay), and each time you lose, it goes back down to 48%. Assume you cannot go bust and that the size of your wager is a constant $100.
