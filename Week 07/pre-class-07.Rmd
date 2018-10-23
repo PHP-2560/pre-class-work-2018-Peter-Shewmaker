@@ -32,8 +32,8 @@ With this project we will simulate a famoues probability problem. This will not 
  1. **Gambler's Ruin**: Suppose you have a bankroll of $1000 and make bets of $100 on a fair game. By simulating the outcome directly for at most 5000 iterations of the game (or hands), estimate:
     a. the probability that you have "busted" (lost all your money) by the time you have placed your one hundredth bet.
 ```{r}
-n_hands <- function(n, bankroll, bet, odds){
-  #This function will give you the amount of money you have if you play n hands with bankroll being the amount of money you begin with betting the amount bet each hand. The odds of winning is given by odds (should be between 0 and 1).
+n_hands <- function(n, bankroll, bet, odds, bust = TRUE){
+  #This function will give you the amount of money you have if you play n hands with bankroll being the amount of money you begin with betting the amount bet each hand. The odds of winning is given by odds (should be between 0 and 1). You also have the option of deciding whether or not you can bust,
   for(i in 1:n){
     win <- rbinom(1,1,odds)
     if(win == 1){
@@ -41,7 +41,7 @@ n_hands <- function(n, bankroll, bet, odds){
     }else{
       bankroll = bankroll - bet
     }
-    if(bankroll == 0){
+    if(bankroll == 0 & bust == TRUE){
       #If you run out of money, the function returns 0 and the number of the hand where you bankrupted.
       return(c(0,i))
     }
@@ -113,5 +113,160 @@ Note: you *must* stop playing if your player has gone bust. How will you handle 
 
 2. **Markov Chains**. Suppose you have a game where the probability of winning on your first hand is 48%; each time you win, that probability goes up by one percentage point for the next game (to a maximum of 100%, where it must stay), and each time you lose, it goes back down to 48%. Assume you cannot go bust and that the size of your wager is a constant $100.
     a. Is this a fair game? Simulate one hundred thousand sequential hands to determine the size of your return. Then repeat this simulation 99 more times to get a range of values to calculate the expectation.
+```{r}
+#This vector will contain the ending bankroll values after 100000 hands.
+end_bankroll_100000 <- c()
+
+p <- 0.48
+#The 100000 hands are simulated 1000 times, after a winning hand the probability goes up by 0.01, after a losing hand the probability is reverted to 0.48.
+for(j in 1:100){
+bankroll = 0
+for(i in 1:100000){
+  if(p >= 1){
+    p = 1
+  }
+    win <- rbinom(1,1,p)
+    #The probability of winning is changed based on whether or not the current hand is won.
+    if(win == 1){
+      bankroll = bankroll + 100
+      p = p + 0.01
+    }else{
+      bankroll = bankroll - 100
+      p = 0.48
+    }
+}
+  end_bankroll_100000[j] <- bankroll
+}
+end_bankroll_100000
+#The mean values at the end are calculated.
+mean(end_bankroll_100000)
+#The mean is a relatively high negative value, so the game is rather unfair.
+```
     b. Repeat this process but change the starting probability to a new value within 2% either way. Get the expected return after 100 repetitions. Keep exploring until you have a return value that is as fair as you can make it. Can you do this automatically?
+```{r}
+#Same process, except now the starting probability is 0.5 rather than 0.48.
+end_bankroll_100000 <- c()
+
+p <- 0.50
+for(j in 1:100){
+bankroll = 0
+for(i in 1:100000){
+  if(p >= 1){
+    p = 1
+  }
+    win <- rbinom(1,1,p)
+    if(win == 1){
+      bankroll = bankroll + 100
+      p = p + 0.01
+      
+    }else{
+      bankroll = bankroll - 100
+      p = 0.50
+    }
+}
+  end_bankroll_100000[j] <- bankroll
+}
+
+mean(end_bankroll_100000)
+#The mean is a relatively high positive value, so the game again is unfair (but in your advantage!)
+
+#Switch to starting probability of 0.49.
+end_bankroll_100000 <- c()
+
+p <- 0.49
+for(j in 1:100){
+bankroll = 0
+for(i in 1:100000){
+  if(p >= 1){
+    p = 1
+  }
+    win <- rbinom(1,1,p)
+    if(win == 1){
+      bankroll = bankroll + 100
+      p = p + 0.01
+    }else{
+      bankroll = bankroll - 100
+      p = 0.49
+    }
+}
+  end_bankroll_100000[j] <- bankroll
+}
+
+mean(end_bankroll_100000)
+#This mean is much closer to 0. You could find a value for p that makes the game even more fair by looping through values from 0.480 to 0.500 and seeing which has the mean closest to 0.
+```
     c. Repeat again, keeping the initial probability at 48%, but this time change the probability increment to a value different from 1%. Get the expected return after 100 repetitions. Keep changing this value until you have a return value that is as fair as you can make it. 
+```{r}
+#Same code as above, except for changing the increment to 2%.
+p <- 0.48
+for(j in 1:100){
+bankroll = 0
+for(i in 1:100000){
+  if(p >= 1){
+    p = 1
+  }
+    win <- rbinom(1,1,p)
+    if(win == 1){
+      bankroll = bankroll + 100
+      #Increment is 2% now.
+      p = p + 0.02
+    }else{
+      bankroll = bankroll - 100
+      p = 0.48
+    }
+}
+  end_bankroll_100000[j] <- bankroll
+}
+
+mean(end_bankroll_100000)
+#Now the mean is quite large. Recall that when the increment was 1% the mean was negative. Testing a couple more values:
+
+p <- 0.48
+for(j in 1:100){
+bankroll = 0
+for(i in 1:100000){
+  if(p >= 1){
+    p = 1
+  }
+    win <- rbinom(1,1,p)
+    if(win == 1){
+      bankroll = bankroll + 100
+      #Increment is 1.5% now.
+      p = p + 0.015
+    }else{
+      bankroll = bankroll - 100
+      p = 0.48
+    }
+}
+  end_bankroll_100000[j] <- bankroll
+}
+
+mean(end_bankroll_100000)
+
+#Now at 1.5% increment, the mean is still quite large. 
+
+p <- 0.48
+for(j in 1:100){
+bankroll = 0
+for(i in 1:100000){
+  if(p >= 1){
+    p = 1
+  }
+    win <- rbinom(1,1,p)
+    if(win == 1){
+      bankroll = bankroll + 100
+      #Increment is 1.1% now.
+      p = p + 0.011
+    }else{
+      bankroll = bankroll - 100
+      p = 0.48
+    }
+}
+  end_bankroll_100000[j] <- bankroll
+}
+
+mean(end_bankroll_100000)
+
+#The increment being 1.1% gives a reasonably fair game.
+
+```
