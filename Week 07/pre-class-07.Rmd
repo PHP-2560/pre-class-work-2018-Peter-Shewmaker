@@ -150,8 +150,8 @@ mean(end_bankroll_100000)
 
 end_bankroll_means <- matrix(nrow = 2, ncol = 100)
 for(j in 1:100){
-  p <- 0.48
-  q <- runif(1, -0.02, 0.02)
+  starting_p <- 0.48 + runif(1, -0.02, 0.02)
+  p <- starting_p
   end_bankroll_10000 <- c()
   bankroll = 0
   for(i in 1:10000){
@@ -161,7 +161,7 @@ for(j in 1:100){
       win <- rbinom(1,1,p)
       if(win == 1){
         bankroll = bankroll + 100
-        p = p + q
+        p = p + 0.01
       
       }else{
         bankroll = bankroll - 100
@@ -169,12 +169,15 @@ for(j in 1:100){
       }
       end_bankroll_10000[i] <- bankroll
   }
-  end_bankroll_means[,j] <- c(q,mean(end_bankroll_10000))
+  end_bankroll_means[,j] <- c(starting_p,mean(end_bankroll_10000))
 }
 
 end_bankroll_means[2,] <- abs(end_bankroll_means[2,])
-x <- which(end_bankroll_means[2,] == min(end_bankroll_means[2,]))
-fairest_p <- 0.48 + end_bankroll_means[,a][1]
+a <- which(end_bankroll_means[2,] == min(end_bankroll_means[2,]))
+fairest_p <- end_bankroll_means[,a][1]
+#This returns the fairest probability value as well as the absolute value of the mean of the bankroll after the 10000 hands.
+fairest_p
+end_bankroll_means[,a][2]
 ```
     c. Repeat again, keeping the initial probability at 48%, but this time change the probability increment to a value different from 1%. Get the expected return after 100 repetitions. Keep changing this value until you have a return value that is as fair as you can make it. 
 ```{r}
