@@ -243,7 +243,7 @@ for(i in 1:100000){
 
 mean(end_bankroll_100000)
 
-#Now at 1.5% increment, the mean is still quite large. 
+#At 1.5% increment, the mean is still quite large. 
 
 p <- 0.48
 for(j in 1:100){
@@ -255,8 +255,8 @@ for(i in 1:100000){
     win <- rbinom(1,1,p)
     if(win == 1){
       bankroll = bankroll + 100
-      #Increment is 1.1% now.
-      p = p + 0.011
+      #Increment is 1.2% now.
+      p = p + 0.012
     }else{
       bankroll = bankroll - 100
       p = 0.48
@@ -267,6 +267,6 @@ for(i in 1:100000){
 
 mean(end_bankroll_100000)
 
-#The increment being 1.1% gives a reasonably fair game.
+#The increment being 1.2% gives a relatively fair game.
 
 ```
